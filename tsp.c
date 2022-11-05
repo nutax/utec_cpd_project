@@ -2,7 +2,9 @@
 // -------------------------------------
 // AUTHORS
 // -------------------------------------
-/* Created by José Ignacio Huby Ochoa */
+/* José Ignacio Huby Ochoa */
+/* Luis Berrospi Rodriguez */
+/* Mario Jacobo Rios Gamboa */
 
 // -------------------------------------
 // DEPENDENCIES
@@ -22,7 +24,7 @@
 
 /* CONSTANTS */
 #define N 4
-#define INF 10000000
+#define INF 1000000
 #define POSSIBILITY_NOT_EVALUATED_VALUE -1
 #define ALL_NODES_VISITED_VALUE ((1 << N) - 1)
 #define NONE_VISITED 0
@@ -62,15 +64,15 @@ int res;
 /* DECLARATIONS */
 int main(int argc, char **argv);
 void read();
-void transform();
+void tsp_seq();
 void write();
-int tsp(int current_node, int visited_nodes);
+int tsp_seq_dp(int current_node, int visited_nodes);
 
 /* DEFINITIONS */
 int main(int argc, char **argv)
 {
     CHECK_TIME("READ", read());
-    CHECK_TIME("TRANSFORM", transform());
+    CHECK_TIME("TSP_SEQ", tsp_seq());
     CHECK_TIME("WRITE", write());
     return EXIT_SUCCESS;
 }
@@ -86,13 +88,14 @@ void read()
     }
 }
 
-void transform()
+void tsp_seq()
 {
     int global_best = INF;
-    for (int current_node = 0; current_node < N; current_node++)
+
+    // PARALELIZAR ESTE FOR CON MPI
+    for (int initial_node = 0; initial_node < N; initial_node++)
     {
-        int local_best = dist[current_node][0];
-        local_best += tsp(current_node, MARK_NODE_VISITED(NONE_VISITED, current_node));
+        int local_best = tsp_seq_dp(initial_node, MARK_NODE_VISITED(NONE_VISITED, initial_node));
         global_best = MIN(global_best, local_best);
     }
     res = global_best;
@@ -100,10 +103,10 @@ void transform()
 
 void write()
 {
-    printf("The cost of most efficient tour = %d", res);
+    printf("The cost of most efficient tour = %d\n", res);
 }
 
-int tsp(int current_node, int visited_nodes)
+int tsp_seq_dp(int current_node, int visited_nodes)
 {
     if (ALL_NODES_VISITED(visited_nodes))
     {
@@ -117,11 +120,14 @@ int tsp(int current_node, int visited_nodes)
 
     int global_best = INF;
 
+    // PARALELIZAR ESTE FOR CON OPENMP SOLO EN EL PRIMER LLAMADO DE LA FUNCIÓN
+    // ES DECIR, LAS SIGUIENTES LLAMADAS RECURSIVAS NO SPAWNEAN MÁS HILOS
     for (int neighbor_node = 0; neighbor_node < N; neighbor_node++)
     {
         if (NODE_IS_NOT_VISITED(visited_nodes, neighbor_node))
         {
-            int local_best = tsp(neighbor_node, MARK_NODE_VISITED(visited_nodes, neighbor_node));
+            int local_best = dist[current_node][neighbor_node];
+            local_best += tsp_seq_dp(neighbor_node, MARK_NODE_VISITED(visited_nodes, neighbor_node));
             global_best = MIN(global_best, local_best);
         }
     }
