@@ -91,7 +91,7 @@ void transform()
     int global_best = INF;
     for (int current_node = 0; current_node < N; current_node++)
     {
-        int local_best = dist[current_node][1];
+        int local_best = dist[current_node][0];
         local_best += tsp(current_node, MARK_NODE_VISITED(NONE_VISITED, current_node));
         global_best = MIN(global_best, local_best);
     }
