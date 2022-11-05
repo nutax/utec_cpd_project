@@ -64,7 +64,7 @@ int main(int argc, char **argv);
 void read();
 void transform();
 void write();
-int tsp(int i, int mask);
+int tsp(int current_node, int visited_nodes);
 
 /* DEFINITIONS */
 int main(int argc, char **argv)
@@ -121,8 +121,7 @@ int tsp(int current_node, int visited_nodes)
     {
         if (NODE_IS_NOT_VISITED(visited_nodes, neighbor_node))
         {
-            int local_best = dist[current_node][neighbor_node];
-            local_best += tsp(neighbor_node, MARK_NODE_VISITED(visited_nodes, neighbor_node));
+            int local_best = tsp(neighbor_node, MARK_NODE_VISITED(visited_nodes, neighbor_node));
             global_best = MIN(global_best, local_best);
         }
     }
