@@ -23,7 +23,7 @@
 // -------------------------------------
 
 /* CONSTANTS */
-#define N 4
+#define N 10
 #define INF 1000000
 #define POSSIBILITY_NOT_EVALUATED_VALUE -1
 #define ALL_NODES_VISITED_VALUE ((1 << N) - 1)
@@ -32,13 +32,19 @@
 /* TYPES */
 
 /* STATIC ALLOCATIONS */
+// random distance matrix size 15x15
 int dist[N][N] = {
-    {0, 10, 15, 20},
-    {10, 0, 25, 25},
-    {15, 25, 0, 30},
-    {20, 25, 30, 0},
-};
-int memo[N][1 << N];
+    {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+    {1, 0, 1, 2, 3, 4, 5, 6, 7, 8},
+    {2, 1, 0, 1, 2, 3, 4, 5, 6, 7},
+    {3, 2, 1, 0, 1, 2, 3, 4, 5, 6},
+    {4, 3, 2, 1, 0, 1, 2, 3, 4, 5},
+    {5, 4, 3, 2, 1, 0, 1, 2, 3, 4},
+    {6, 5, 4, 3, 2, 1, 0, 1, 2, 3},
+    {7, 6, 5, 4, 3, 2, 1, 0, 1, 2},
+    {8, 7, 6, 5, 4, 3, 2, 1, 0, 1},
+    {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}};
+int memo[1 << N][N];
 int res;
 
 // -------------------------------------
@@ -60,6 +66,10 @@ int res;
 #define POSSIBILITY_EVALUATED(x) (x != POSSIBILITY_NOT_EVALUATED_VALUE)
 #define NODE_IS_NOT_VISITED(arr, x) ((arr & (1 << x)) == 0)
 #define MARK_NODE_VISITED(arr, x) (arr | (1 << x))
+#define TEST(_name, _f)         \
+    CHECK_TIME("READ", read()); \
+    CHECK_TIME(_name, _f);      \
+    CHECK_TIME("WRITE", write())
 
 /* DECLARATIONS */
 int main(int argc, char **argv);
@@ -71,9 +81,7 @@ int tsp_seq_dp(int current_node, int visited_nodes);
 /* DEFINITIONS */
 int main(int argc, char **argv)
 {
-    CHECK_TIME("READ", read());
-    CHECK_TIME("TSP_SEQ", tsp_seq());
-    CHECK_TIME("WRITE", write());
+    TEST("TSP_SEQ", tsp_seq());
     return EXIT_SUCCESS;
 }
 
