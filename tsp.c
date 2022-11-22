@@ -511,6 +511,8 @@ int tsp_seq_dp(int current_node, int visited_nodes);
 int tsp_threads_2_dp(int current_node, int visited_nodes);
 void tsp_threads_1();
 void tsp_threads_2();
+void tsp_process();
+void tsp_hybrid();
 
 /* DEFINITIONS */
 int main(int argc, char **argv)
@@ -518,6 +520,8 @@ int main(int argc, char **argv)
     TEST("TSP_SEQ", tsp_seq());
     TEST("TSP_THR_1", tsp_threads_1());
     TEST("TSP_THR_2", tsp_threads_2());
+    TEST("TSP_PRO", tsp_process()); // TODO
+    TEST("TSP_HYB", tsp_hybrid());  // TODO
     return EXIT_SUCCESS;
 }
 
@@ -627,4 +631,28 @@ int tsp_threads_2_dp(int current_node, int visited_nodes)
     }
 
     return memo[visited_nodes][current_node] = global_best;
+}
+
+void tsp_process()
+{
+    int global_best = INF;
+
+    for (int initial_node = 0; initial_node < N; initial_node++)
+    {
+        int local_best = tsp_seq_dp(initial_node, MARK_NODE_VISITED(NONE_VISITED, initial_node));
+        global_best = MIN(global_best, local_best);
+    }
+    res = global_best;
+}
+
+void tsp_hybrid()
+{
+    int global_best = INF;
+
+    for (int initial_node = 0; initial_node < N; initial_node++)
+    {
+        int local_best = tsp_threads_2_dp(initial_node, MARK_NODE_VISITED(NONE_VISITED, initial_node));
+        global_best = MIN(global_best, local_best);
+    }
+    res = global_best;
 }
