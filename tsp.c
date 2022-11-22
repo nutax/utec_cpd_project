@@ -536,7 +536,6 @@ void tsp_seq()
 {
     int global_best = INF;
 
-    // PARALELIZAR ESTE FOR CON MPI
     for (int initial_node = 0; initial_node < N; initial_node++)
     {
         int local_best = tsp_seq_dp(initial_node, MARK_NODE_VISITED(NONE_VISITED, initial_node));
@@ -564,8 +563,6 @@ int tsp_seq_dp(int current_node, int visited_nodes)
 
     int global_best = INF;
 
-    // PARALELIZAR ESTE FOR CON OPENMP SOLO EN EL PRIMER LLAMADO DE LA FUNCIÓN
-    // ES DECIR, LAS SIGUIENTES LLAMADAS RECURSIVAS NO SPAWNEAN MÁS HILOS
     for (int neighbor_node = 0; neighbor_node < N; neighbor_node++)
     {
         if (NODE_IS_NOT_VISITED(visited_nodes, neighbor_node))
@@ -583,7 +580,6 @@ void tsp_threads_1()
 {
     int global_best = INF;
 
-// PARALELIZAR ESTE FOR CON MPI
 #pragma omp parallel for
     for (int initial_node = 0; initial_node < N; initial_node++)
     {
@@ -597,7 +593,6 @@ void tsp_threads_2()
 {
     int global_best = INF;
 
-    // PARALELIZAR ESTE FOR CON MPI
     for (int initial_node = 0; initial_node < N; initial_node++)
     {
         int local_best = tsp_threads_2_dp(initial_node, MARK_NODE_VISITED(NONE_VISITED, initial_node));
@@ -620,8 +615,6 @@ int tsp_threads_2_dp(int current_node, int visited_nodes)
 
     int global_best = INF;
 
-// PARALELIZAR ESTE FOR CON OPENMP SOLO EN EL PRIMER LLAMADO DE LA FUNCIÓN
-// ES DECIR, LAS SIGUIENTES LLAMADAS RECURSIVAS NO SPAWNEAN MÁS HILOS
 #pragma omp parallel for
     for (int neighbor_node = 0; neighbor_node < N; neighbor_node++)
     {
