@@ -497,10 +497,10 @@ int res;
 #define POSSIBILITY_EVALUATED(x) (x != POSSIBILITY_NOT_EVALUATED_VALUE)
 #define NODE_IS_NOT_VISITED(arr, x) ((arr & (1 << x)) == 0)
 #define MARK_NODE_VISITED(arr, x) (arr | (1 << x))
-#define TEST(_name, _f)         \
-    CHECK_TIME("READ", read()); \
-    CHECK_TIME(_name, _f);      \
-    CHECK_TIME("WRITE", write())
+#define TEST(_name, _f)    \
+    read();                \
+    CHECK_TIME(_name, _f); \
+    write()
 
 /* DECLARATIONS */
 int main(int argc, char **argv);
@@ -508,13 +508,16 @@ void read();
 void tsp_seq();
 void write();
 int tsp_seq_dp(int current_node, int visited_nodes);
+int tsp_threads_2_dp(int current_node, int visited_nodes);
 void tsp_threads_1();
+void tsp_threads_2();
 
 /* DEFINITIONS */
 int main(int argc, char **argv)
 {
     TEST("TSP_SEQ", tsp_seq());
     TEST("TSP_THR_1", tsp_threads_1());
+    TEST("TSP_THR_2", tsp_threads_2());
     return EXIT_SUCCESS;
 }
 
@@ -588,4 +591,47 @@ void tsp_threads_1()
         global_best = MIN(global_best, local_best);
     }
     res = global_best;
+}
+
+void tsp_threads_2()
+{
+    int global_best = INF;
+
+    // PARALELIZAR ESTE FOR CON MPI
+    for (int initial_node = 0; initial_node < N; initial_node++)
+    {
+        int local_best = tsp_threads_2_dp(initial_node, MARK_NODE_VISITED(NONE_VISITED, initial_node));
+        global_best = MIN(global_best, local_best);
+    }
+    res = global_best;
+}
+
+int tsp_threads_2_dp(int current_node, int visited_nodes)
+{
+    if (ALL_NODES_VISITED(visited_nodes))
+    {
+        return dist[current_node][0];
+    }
+
+    if (POSSIBILITY_EVALUATED(memo[visited_nodes][current_node]))
+    {
+        return memo[visited_nodes][current_node];
+    }
+
+    int global_best = INF;
+
+// PARALELIZAR ESTE FOR CON OPENMP SOLO EN EL PRIMER LLAMADO DE LA FUNCIÓN
+// ES DECIR, LAS SIGUIENTES LLAMADAS RECURSIVAS NO SPAWNEAN MÁS HILOS
+#pragma omp parallel for
+    for (int neighbor_node = 0; neighbor_node < N; neighbor_node++)
+    {
+        if (NODE_IS_NOT_VISITED(visited_nodes, neighbor_node))
+        {
+            int local_best = dist[current_node][neighbor_node];
+            local_best += tsp_seq_dp(neighbor_node, MARK_NODE_VISITED(visited_nodes, neighbor_node));
+            global_best = MIN(global_best, local_best);
+        }
+    }
+
+    return memo[visited_nodes][current_node] = global_best;
 }
