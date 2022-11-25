@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <time.h>
+#include <omp.h>
 
 // -------------------------------------
 // DATA
@@ -25,16 +26,20 @@
 /* CONSTANTS */
 #define MAX_NODES 1024
 #define MAX_LINE_SIZE 1024
+#define MAX_TRIES 128
 #define CACHE_LINE 64
 
 /* TYPES */
 
 /* STATIC ALLOCATIONS */
 int n_nodes, n_threads, n_tries;
+int global_best_i;
+float global_best;
 
 float xpos[MAX_NODES];
 float ypos[MAX_NODES];
 float dmat[MAX_NODES][MAX_NODES];
+float path[MAX_TRIES][MAX_NODES];
 
 // -------------------------------------
 // PROCEDURES
@@ -61,6 +66,7 @@ void write();
 void solve();
 void solve_distances();
 void solve_tsp();
+float tsp_try(int try, unsigned int *seed);
 
 /* DEFINITIONS */
 int main(int argc, char **argv)
@@ -113,6 +119,12 @@ void read_coords()
 
 void write()
 {
+    printf("Best aproximation length: %f\n", global_best);
+    for (int i = 0; i < n_nodes; ++i)
+    {
+        printf("%d ", path[global_best_i][i]);
+    }
+    printf("\n");
 }
 
 void solve()
@@ -143,5 +155,31 @@ void solve_distances()
 
 void solve_tsp()
 {
-    
+    float local_best[n_tries][16];
+
+#pragma omp parallel default(none) shared(local_best)
+    {
+        unsigned int myseed = omp_get_thread_num();
+#pragma omp for
+        for (int i = 0; i < n_tries; i++)
+        {
+            local_best[i][0] = tsp_try(i, &myseed);
+        }
+    }
+
+    global_best = local_best[0][0];
+    global_best_i = 0;
+    for (int i = 1; i < n_tries; ++i)
+    {
+        if (local_best[i][0] < global_best)
+        {
+            global_best_i = i;
+            global_best = local_best[i][0];
+        }
+    }
+}
+
+float tsp_try(int try, unsigned int *seed)
+{
+    return 0.0f;
 }
