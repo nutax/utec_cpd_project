@@ -195,6 +195,17 @@ float tsp_try(int try, unsigned int *seed)
 
 void try_shuffle(int try, unsigned int *seed)
 {
+    for (int i = 0; i < n_nodes; ++i)
+    {
+        path[try][i] = i;
+    }
+    for (int i = 0; i < n_nodes - 1; i++)
+    {
+        int const j = i + rand_r(seed) / (RAND_MAX / (n_nodes - i) + 1);
+        int const aux = path[try][j];
+        path[try][j] = path[try][i];
+        path[try][i] = aux;
+    }
 }
 
 float try_2opt(int try)
