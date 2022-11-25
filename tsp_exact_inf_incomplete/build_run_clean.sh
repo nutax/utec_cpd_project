@@ -1,0 +1,1 @@
+g++ -fopenmp -Ofast -march=native main.cpp -I. && ./a.out && rm a.out
