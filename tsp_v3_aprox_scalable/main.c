@@ -86,12 +86,15 @@ void init(int argc, char **argv)
     assert(argc >= 4);
 
     n_tries = atoi(argv[1]);
+    assert(n_tries > 0);
     assert(n_tries <= MAX_TRIES);
 
     n_threads = atoi(argv[2]);
+    assert(n_threads > 0);
     assert(n_threads <= MAX_THREADS);
 
     n_nodes = atoi(argv[3]);
+    assert(n_nodes > 0);
     assert(n_nodes <= MAX_NODES);
 }
 
