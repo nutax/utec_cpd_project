@@ -40,7 +40,7 @@ float global_best;
 float xpos[MAX_NODES];
 float ypos[MAX_NODES];
 float dmat[MAX_NODES][MAX_NODES];
-float path[MAX_TRIES][MAX_NODES];
+int path[MAX_TRIES][MAX_NODES];
 
 // -------------------------------------
 // PROCEDURES
@@ -69,7 +69,10 @@ void solve_distances();
 void solve_tsp();
 float tsp_try(int try, unsigned int *seed);
 void try_shuffle(int try, unsigned int *seed);
-float try_2opt(int try);
+float try_opt2(int try);
+int opt2_check(int try, int i, int j);
+void opt2_reverse(int try, int i, int j);
+float opt2_cost(int try);
 
 /* DEFINITIONS */
 int main(int argc, char **argv)
@@ -208,6 +211,48 @@ void try_shuffle(int try, unsigned int *seed)
     }
 }
 
-float try_2opt(int try)
+float try_opt2(int try)
 {
+    for (int i = 0; i < (n_nodes - 2); i++)
+    {
+        for (int j = 0; i < (n_nodes - 1); i++)
+        {
+            int is_better = opt2_check(try, i, j);
+            if (is_better)
+            {
+                opt2_reverse(try, i, j);
+                return try_opt2(try);
+            }
+        }
+    }
+    return opt2_cost(try);
+}
+int opt2_check(int try, int i, int j)
+{
+    int const i2 = (i - 1 + n_nodes) % n_nodes;
+    int const j2 = j + 1;
+    float const direct_dist = dmat[path[try][i]][path[try][i2]] + dmat[path[try][j]][path[try][j2]];
+    float const indirect_dist = dmat[path[try][j]][path[try][i2]] + dmat[path[try][i]][path[try][j2]];
+    return direct_dist > indirect_dist;
+}
+void opt2_reverse(int try, int i, int j)
+{
+    while (i < j)
+    {
+        int const aux = path[try][i];
+        path[try][i] = path[try][j];
+        path[try][j] = aux;
+        i++;
+        j--;
+    }
+}
+float opt2_cost(int try)
+{
+    float cost = 0;
+    for (int i = 0; i < (n_nodes - 1); i++)
+    {
+        cost += dmat[path[try][i]][path[try][i + 1]];
+    }
+    cost += dmat[path[try][n_nodes - 1]][path[try][0]];
+    return cost;
 }
