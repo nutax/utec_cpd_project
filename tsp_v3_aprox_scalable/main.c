@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <time.h>
 #include <omp.h>
+#include <math.h>
 
 // -------------------------------------
 // DATA
@@ -26,7 +27,7 @@
 /* CONSTANTS */
 #define MAX_NODES 1024
 #define MAX_LINE_SIZE 1024
-#define MAX_TRIES 128
+#define MAX_TRIES 4096
 #define MAX_THREADS 64
 #define CACHE_LINE 64
 
@@ -115,7 +116,7 @@ void read_metadata()
     for (int i = 0; i < 8; ++i)
     {
         scanf(" %[^\n]", buffer);
-        printf("%s\n", buffer);
+        // printf("%s\n", buffer);
     }
 }
 
@@ -156,7 +157,7 @@ void solve_distances()
             float const xdist = xdiff * xdiff;
             float const ydist = ydiff * ydiff;
 
-            float const dist = xdist + ydist;
+            float const dist = sqrt(xdist + ydist);
 
             dmat[i][j] = dist;
             dmat[j][i] = dist;
@@ -168,11 +169,12 @@ void solve_tsp()
 {
     float local_best[n_tries][16];
 
-#pragma omp parallel default(none) shared(local_best) private(n_tries)
+    int const _n_tries = n_tries;
+#pragma omp parallel shared(local_best) num_threads(n_threads)
     {
         unsigned int myseed = omp_get_thread_num();
 #pragma omp for
-        for (int i = 0; i < n_tries; i++)
+        for (int i = 0; i < _n_tries; i++)
         {
             local_best[i][0] = tsp_try(i, &myseed);
         }
@@ -215,7 +217,7 @@ float try_opt2(int try)
 {
     for (int i = 0; i < (n_nodes - 2); i++)
     {
-        for (int j = 0; i < (n_nodes - 1); i++)
+        for (int j = i + 1; j < (n_nodes - 1); j++)
         {
             int is_better = opt2_check(try, i, j);
             if (is_better)
