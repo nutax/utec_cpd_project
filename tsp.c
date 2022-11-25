@@ -520,7 +520,7 @@ int main(int argc, char **argv)
     TEST("TSP_SEQ", tsp_seq());
     TEST("TSP_THR_1", tsp_threads_1());
     TEST("TSP_THR_2", tsp_threads_2());
-    TEST("TSP_PRO", tsp_process()); // TODO
+    TEST("TSP_PR    O", tsp_process()); // TODO
     TEST("TSP_HYB", tsp_hybrid());  // TODO
     return EXIT_SUCCESS;
 }
