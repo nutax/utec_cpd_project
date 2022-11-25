@@ -134,15 +134,15 @@ void write()
     printf("Best aproximation length: %f\n", global_best);
     for (int i = 0; i < n_nodes; ++i)
     {
-        printf("%d ", path[global_best_i][i]);
+        // printf("%d ", path[global_best_i][i]);
     }
     printf("\n");
 }
 
 void solve()
 {
-    solve_distances();
-    solve_tsp();
+    CHECK_TIME("DIST", solve_distances());
+    CHECK_TIME("TSP", solve_tsp());
 }
 
 void solve_distances()
@@ -158,6 +158,7 @@ void solve_distances()
             float const ydist = ydiff * ydiff;
 
             float const dist = sqrt(xdist + ydist);
+            // float const dist = xdist + ydist;
 
             dmat[i][j] = dist;
             dmat[j][i] = dist;

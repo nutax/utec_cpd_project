@@ -1,1 +1,1 @@
-gcc -std=c11 -fopenmp -Ofast -march=native main.c -I. && ./a.out 4096 8 131 < ../data/large/131.tsp && rm a.out
+gcc -std=c11 -fopenmp -Ofast -march=native main.c -I. && ./a.out 16 8 984 < ../data/large/984.tsp && rm a.out
