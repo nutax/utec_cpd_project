@@ -23,14 +23,18 @@
 // -------------------------------------
 
 /* CONSTANTS */
-#define MAX_NODES 1000
+#define MAX_NODES 1024
+#define MAX_LINE_SIZE 1024
+#define CACHE_LINE 64
 
 /* TYPES */
-typedef float dist_t;
 
 /* STATIC ALLOCATIONS */
-int n_nodes;
-dist_t dist[MAX_NODES][MAX_NODES];
+int n_nodes, n_threads, n_tries;
+
+float xpos[MAX_NODES];
+float ypos[MAX_NODES];
+float dmat[MAX_NODES][MAX_NODES];
 
 // -------------------------------------
 // PROCEDURES
@@ -49,34 +53,95 @@ dist_t dist[MAX_NODES][MAX_NODES];
 
 /* DECLARATIONS */
 int main(int argc, char **argv);
+void init(int argc, char **argv);
 void read();
+void read_metadata();
+void read_coords();
 void write();
-void solve(int tries, int threads);
+void solve();
+void solve_distances();
+void solve_tsp();
 
 /* DEFINITIONS */
 int main(int argc, char **argv)
 {
-    if (argc < 3)
-    {
-        printf("Execution arguments missing!\n");
-        return EXIT_FAILURE;
-    }
+    init(argc, argv);
 
     read();
-    solve(atoi(argv[1]), atoi(argv[2]));
+    solve();
     write();
 
     return EXIT_SUCCESS;
 }
 
+void init(int argc, char **argv)
+{
+    if (argc < 4)
+    {
+        printf("Execution arguments missing!\n");
+        exit(EXIT_FAILURE);
+    }
+    n_tries = atoi(argv[1]);
+    n_threads = atoi(argv[2]);
+    n_nodes = atoi(argv[3]);
+}
+
 void read()
 {
+    read_metadata();
+    read_coords();
+}
+
+void read_metadata()
+{
+    char buffer[MAX_LINE_SIZE];
+    for (int i = 0; i < 8; ++i)
+    {
+        scanf(" %[^\n]", buffer);
+        printf("%s\n", buffer);
+    }
+}
+
+void read_coords()
+{
+    int node_index;
+    for (int i = 0; i < n_nodes; ++i)
+    {
+        scanf("%d %f %f", &node_index, xpos + i, ypos + i);
+    }
 }
 
 void write()
 {
 }
 
-void solve(int tries, int threads)
+void solve()
 {
+    solve_distances();
+    solve_tsp();
+}
+
+void solve_distances()
+{
+    for (int i = 0; i < (n_nodes - 1); ++i)
+    {
+        for (int j = i + 1; j < n_nodes; ++j)
+        {
+            float const xdiff = xpos[i] - xpos[j];
+            float const ydiff = ypos[i] - ypos[j];
+
+            float const xdist = xdiff * xdiff;
+            float const ydist = ydiff * ydiff;
+
+            float const dist = xdist + ydist;
+
+            dmat[i][j] = dist;
+            dmat[j][i] = dist;
+        }
+    }
+}
+
+void solve_tsp()
+{
+    
 }
