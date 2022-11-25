@@ -419,6 +419,7 @@ tsp::dp::from_one::seq::solver<distance_t, N> solver_seq(memo, matrix);
 int main()
 {
     memo.reserve(1 << N);
+    //#pragma omp parallel for
     for (std::size_t i = 0; i < N; ++i)
         std::cout << solver_seq.solve(i) << std::endl;
     return EXIT_SUCCESS;
