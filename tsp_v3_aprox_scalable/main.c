@@ -68,6 +68,8 @@ void solve();
 void solve_distances();
 void solve_tsp();
 float tsp_try(int try, unsigned int *seed);
+void try_shuffle(int try, unsigned int *seed);
+float try_2opt(int try);
 
 /* DEFINITIONS */
 int main(int argc, char **argv)
@@ -187,5 +189,14 @@ void solve_tsp()
 
 float tsp_try(int try, unsigned int *seed)
 {
-    return 0.0f;
+    try_shuffle(try, seed);
+    return try_2opt(try);
+}
+
+void try_shuffle(int try, unsigned int *seed)
+{
+}
+
+float try_2opt(int try)
+{
 }
