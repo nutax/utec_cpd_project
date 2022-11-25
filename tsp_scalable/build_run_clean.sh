@@ -1,0 +1,1 @@
+g++ -fopenmp -Ofast -march=native tsp_scalable.cpp -I. && ./a.out && rm a.out

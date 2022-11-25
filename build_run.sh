@@ -1,1 +1,0 @@
-gcc -fopenmp -Ofast -march=native tsp.c && ./a.out

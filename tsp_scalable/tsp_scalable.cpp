@@ -1,3 +1,10 @@
+// -------------------------------------
+// AUTHORS
+// -------------------------------------
+/* José Ignacio Huby Ochoa */
+/* Luis Berrospi Rodriguez */
+/* Mario Jacobo Rios Gamboa */
+
 #include <iostream>
 #include <stdlib.h>
 #include "tsp/dp/from_one/seq/solver.hpp"

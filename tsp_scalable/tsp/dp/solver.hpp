@@ -1,3 +1,10 @@
+// -------------------------------------
+// AUTHORS
+// -------------------------------------
+/* José Ignacio Huby Ochoa */
+/* Luis Berrospi Rodriguez */
+/* Mario Jacobo Rios Gamboa */
+
 #include <bitset>
 #include <array>
 #include <unordered_map>
