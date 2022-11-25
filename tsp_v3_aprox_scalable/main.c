@@ -168,7 +168,7 @@ void solve_tsp()
 {
     float local_best[n_tries][16];
 
-#pragma omp parallel default(none) shared(local_best)
+#pragma omp parallel default(none) shared(local_best) private(n_tries)
     {
         unsigned int myseed = omp_get_thread_num();
 #pragma omp for
@@ -193,7 +193,7 @@ void solve_tsp()
 float tsp_try(int try, unsigned int *seed)
 {
     try_shuffle(try, seed);
-    return try_2opt(try);
+    return try_opt2(try);
 }
 
 void try_shuffle(int try, unsigned int *seed)
