@@ -27,6 +27,7 @@
 #define MAX_NODES 1024
 #define MAX_LINE_SIZE 1024
 #define MAX_TRIES 128
+#define MAX_THREADS 64
 #define CACHE_LINE 64
 
 /* TYPES */
@@ -82,14 +83,16 @@ int main(int argc, char **argv)
 
 void init(int argc, char **argv)
 {
-    if (argc < 4)
-    {
-        printf("Execution arguments missing!\n");
-        exit(EXIT_FAILURE);
-    }
+    assert(argc >= 4);
+
     n_tries = atoi(argv[1]);
+    assert(n_tries <= MAX_TRIES);
+
     n_threads = atoi(argv[2]);
+    assert(n_threads <= MAX_THREADS);
+
     n_nodes = atoi(argv[3]);
+    assert(n_nodes <= MAX_NODES);
 }
 
 void read()
