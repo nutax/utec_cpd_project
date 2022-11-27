@@ -62,10 +62,16 @@ int path[MAX_TRIES][MAX_NODES];
 /* DECLARATIONS */
 int main(int argc, char **argv);
 void init(int argc, char **argv);
+void init_mpi(int argc, char **argv);
+void init_arg(int argc, char **argv);
+void test();
 void read();
 void read_metadata();
 void read_coords();
+void broadcast();
+void reduce();
 void write();
+void finalize();
 void solve();
 void solve_distances();
 void solve_tsp();
@@ -81,23 +87,31 @@ int main(int argc, char **argv)
 {
     init(argc, argv);
 
-    // read();
-    // solve();
-    // write();
+    read();
+    broadcast();
+    solve();
+    reduce();
+    write();
+    finalize();
 
     return EXIT_SUCCESS;
 }
 
 void init(int argc, char **argv)
 {
+    init_mpi(argc, argv);
+    init_arg(argc, argv);
+}
+
+void init_mpi(int argc, char **argv)
+{
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
     MPI_Comm_size(MPI_COMM_WORLD, &n_processes);
-    if (process_id == 0)
-    {
-        printf("MPI initialized with %d processes\n", n_processes);
-    }
+}
 
+void init_arg(int argc, char **argv)
+{
     assert(argc >= 4);
 
     n_tries = atoi(argv[1]);
@@ -113,10 +127,18 @@ void init(int argc, char **argv)
     assert(n_nodes <= MAX_NODES);
 }
 
+void finalize()
+{
+    MPI_Finalize();
+}
+
 void read()
 {
-    read_metadata();
-    read_coords();
+    if (process_id > -1)
+    {
+        read_metadata();
+        read_coords();
+    }
 }
 
 void read_metadata()
@@ -136,6 +158,17 @@ void read_coords()
     {
         scanf("%d %f %f", &node_index, xpos + i, ypos + i);
     }
+}
+
+void broadcast()
+{
+    MPI_Bcast(xpos, n_nodes, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(ypos, n_nodes, MPI_FLOAT, 0, MPI_COMM_WORLD);
+}
+
+void reduce()
+{
+    MPI_Reduce(&global_best, &global_best, 1, MPI_FLOAT, MPI_MIN, 0, MPI_COMM_WORLD);
 }
 
 void write()
@@ -182,7 +215,9 @@ void solve_tsp()
     int const _n_tries = n_tries;
 #pragma omp parallel shared(local_best) num_threads(n_threads)
     {
-        unsigned int myseed = omp_get_thread_num();
+        unsigned int thread_id = omp_get_thread_num();
+        unsigned int myseed = thread_id*thread_id + process_id*process_id;
+        
 #pragma omp for
         for (int i = 0; i < _n_tries; i++)
         {
