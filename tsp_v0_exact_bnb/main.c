@@ -1,3 +1,5 @@
+// Este código no fue inicialmente realizado por nosotros.
+// Obtenido de Geeks4Geeks: https://www.geeksforgeeks.org/traveling-salesman-problem-using-branch-and-bound-2/
 // C++ program to solve Traveling Salesman Problem
 // using Branch and Bound.
 #include <string.h>
