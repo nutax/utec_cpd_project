@@ -25,7 +25,7 @@
 // -------------------------------------
 
 /* CONSTANTS */
-#define MAX_NODES 1024
+#define MAX_NODES 2048
 #define MAX_LINE_SIZE 1024
 #define MAX_TRIES 4096
 #define MAX_THREADS 64
@@ -55,7 +55,7 @@ int path[MAX_TRIES][MAX_NODES];
         __VA_ARGS__;                                                                                        \
         clock_gettime(CLOCK_REALTIME, &end);                                                                \
         double f = ((double)end.tv_sec * 1e9 + end.tv_nsec) - ((double)start.tv_sec * 1e9 + start.tv_nsec); \
-        printf(_name " time %f ms\n", f / 1000000);                                                         \
+        printf("%f\n", f / 1000000);                                                                        \
     }
 
 /* DECLARATIONS */
@@ -131,17 +131,13 @@ void read_coords()
 
 void write()
 {
-    printf("Best aproximation length: %f\n", global_best);
-    for (int i = 0; i < n_nodes; ++i)
-    {
-        // printf("%d ", path[global_best_i][i]);
-    }
-    printf("\n");
+    printf("%f", global_best);
 }
 
 void solve()
 {
-    CHECK_TIME("DIST", solve_distances());
+    // CHECK_TIME("DIST", solve_distances());
+    solve_distances();
     CHECK_TIME("TSP", solve_tsp());
 }
 
